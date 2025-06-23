@@ -50,7 +50,7 @@ Don't return markdown or commentary. Just the JSON.
   console.log("✅ GPT returned:", spots); // 🔍 confirm what GPT gives you
   res.status(200).json({ spots });
 } catch (err) {
-  console.error("❌ Failed to parse GPT:", reply); // 👀 inspect raw
+  console.error("❌ Failed to parse GPT:", err); // 👀 inspect raw
   res.status(500).json({ error: "Failed to parse GPT response", raw: reply });
 }
 
