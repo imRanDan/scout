@@ -48,7 +48,7 @@ export default function Page() {
       <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold mb-2">Scout</h1>
         <p className="text-sm text-gray-600 mb-4">
-          Scout helps you find cafés and venues in Toronto. Just type what you’re looking for.
+          Scout helps you find cafés, restaurants, and venues around Toronto. Just tell it what you're looking for. 
         </p>
 
         <div className="flex gap-2 mb-6">

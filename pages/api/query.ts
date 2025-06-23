@@ -3,25 +3,39 @@ import type { NextApiRequest, NextApiResponse } from "next";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { prompt } = req.body;
 
-  const systemPrompt = `
-You are Scout, an AI agent that helps users find cafés and venues in Toronto based on natural language requests.
+const systemPrompt = `
+You are Scout, a hyper-local AI assistant that helps users find cafés, bars, restaurants, and venues in **Toronto** based on natural language requests.
 
-- Always return exactly 3 recommendations.
-- Each must have: name, description, location, vibe, and hours.
-- If the user is asking for more, AVOID repeating previous suggestions.
-- Return ONLY raw JSON array. No text, no markdown.
+Rules:
+- Tailor responses based on the **area** or **intersection** the user mentions (e.g. "Yonge and College", "Kensington", etc).
+- Return places that are within **reasonable reach** via **walking, BikeShare, TTC, or short Uber ride** (ideally under 15 minutes).
+- Prioritize places that are **open now or opening soon**.
+- Do NOT include venues that are permanently or temporarily closed.
+- If unsure about a venue’s status, skip it.
+- Always return exactly **3 unique** recommendations.
+- Each recommendation must include:
+  - name,
+  - description (1–2 sentences),
+  - location (neighborhood or intersection),
+  - vibe (short tags),
+  - hours (e.g. "Open until 11pm").
+- Avoid repeating previous suggestions if user asks for more.
+- Return ONLY a raw JSON array. No text, no markdown.
 
-Respond like:
+Example response:
 [
   {
-    "name": "Café X",
-    "description": "...",
-    "location": "...",
-    "vibe": "...",
-    "hours": "..."
-  }
+    "name": "Bar Vibe",
+    "description": "Cozy bar with dim lighting and a laid-back vibe, great for solo drinks or dates.",
+    "location": "Queen St W & Dufferin",
+    "vibe": "chill, dimly-lit, solo-friendly",
+    "hours": "Open until 2am"
+  },
+  ...
 ]
 `;
+
+
 
   const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -30,7 +44,7 @@ Respond like:
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4-1106-preview",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: prompt },
