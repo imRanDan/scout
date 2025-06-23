@@ -15,13 +15,17 @@ type Spot = {
 export default function Page() {
   const [input, setInput] = useState('');
   const [results, setResults] = useState<Spot[]>([]);
-const [loading, setLoading] = useState(false);         // for "Go"
-const [loadingMore, setLoadingMore] = useState(false); // for "Show me more"
+  const [loading, setLoading] = useState(false);         // for "Go"
+  const [loadingMore, setLoadingMore] = useState(false); // for "Show me more"
 
 const fetchSpots = async (append = false) => {
   if (!input) return;
 
-  append ? setLoadingMore(true) : setLoading(true);
+  if (append) {
+    setLoadingMore(true);
+  } else {
+    setLoading(true);
+  }
 
   const res = await fetch('/api/query', {
     method: 'POST',
