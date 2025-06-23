@@ -1,6 +1,8 @@
 'use client';
 
 import { useState} from 'react';
+import { motion } from "framer-motion";
+import Spinner from '@/components/Spinner';
 
 type Spot = {
   name: string;
@@ -13,35 +15,39 @@ type Spot = {
 export default function Page() {
   const [input, setInput] = useState('');
   const [results, setResults] = useState<Spot[]>([]);
-  const [loading, setLoading] = useState(false);
+const [loading, setLoading] = useState(false);         // for "Go"
+const [loadingMore, setLoadingMore] = useState(false); // for "Show me more"
 
-  const fetchSpots = async (append = false) => {
-    if (!input) return;
-    setLoading(true);
-    const res = await fetch('/api/query', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: input }),
-    });
+const fetchSpots = async (append = false) => {
+  if (!input) return;
 
-    const data = await res.json();
+  append ? setLoadingMore(true) : setLoading(true);
 
-    if (!data?.spots) {
-      setLoading(false);
-      return;
-    }
+  const res = await fetch('/api/query', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt: input }),
+  });
 
-    setResults((prev) => {
-      if (!append) return data.spots;
+  const data = await res.json();
 
-      const existingNames = new Set(prev.map((s) => s.name));
-      const newUnique = data.spots.filter((s: Spot) => !existingNames.has(s.name));
-
-      return [...prev, ...newUnique];
-    });
-
+  if (!data?.spots) {
     setLoading(false);
-  };
+    setLoadingMore(false);
+    return;
+  }
+
+  setResults((prev) => {
+    if (!append) return data.spots;
+
+    const existingNames = new Set(prev.map((s) => s.name));
+    const newUnique = data.spots.filter((s: Spot) => !existingNames.has(s.name));
+    return [...prev, ...newUnique];
+  });
+
+  setLoading(false);
+  setLoadingMore(false);
+};
 
   return (
     <div className="min-h-screen p-6 bg-gray-100">
@@ -59,17 +65,24 @@ export default function Page() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Find a cozy café near Queen West..."
           />
-          <button
-            onClick={() => fetchSpots()}
-            className="px-4 py-2 bg-blue-600 text-white rounded"
-          >
-            {loading ? 'Searching...' : 'Go'}
-          </button>
+        <button
+          onClick={() => fetchSpots()}
+          className="px-4 py-2 bg-blue-600 text-white rounded flex items-center justify-center"
+        >
+          {loading ? <Spinner /> : <span>Go</span>}
+        </button>
         </div>
 
         <div className="space-y-4">
-          {results.map((spot, idx) => (
-            <div key={idx} className="p-4 bg-white rounded shadow">
+          {results.map((spot, index) => (
+            
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              className="rounded-lg p-4 bg-white shadow"
+            >
               <h2 className="text-xl font-semibold">{spot.name}</h2>
               <p className="text-gray-700">{spot.description}</p>
               <p className="text-sm text-gray-500">
@@ -85,7 +98,7 @@ export default function Page() {
               >
                 🗺 View on Google Maps
               </a>
-            </div>
+           </motion.div>
           ))}
         </div>
 
@@ -93,10 +106,10 @@ export default function Page() {
           <div className="text-center mt-6">
             <button
               onClick={() => fetchSpots(true)}
-              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-sm rounded"
-              disabled={loading}
+              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-sm rounded flex items-center justify-center"
+              disabled={loadingMore}
             >
-              {loading ? 'Loading more...' : '🔁 Show me more'}
+              {loadingMore ? <Spinner /> : '🔁 Show me more'}
             </button>
           </div>
         )}
