@@ -56,9 +56,9 @@ const fetchSpots = async (append = false) => {
   return (
     <div className="min-h-screen p-6 bg-gray-100">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">Scout</h1>
+        <h1 className="text-3xl text-gray-900 font-bold mb-2">Scout</h1>
         <p className="text-sm text-gray-600 mb-4">
-          Scout helps you find cafés, restaurants, and venues around Toronto. Just tell it what you are looking for. 
+          Scout helps you find cafés, restaurants, and venues to host at around Toronto. Just tell it what you are looking for. 
         </p>
 
         <div className="flex gap-2 mb-6">
