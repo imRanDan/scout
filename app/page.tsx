@@ -86,6 +86,8 @@ const fetchSpots = async (prompt?: string, append = false) => {
             "Quiet Coffee shop to work at",
             "Restaurant open late",
             "Host a group of 10 for happy hour",
+            "Arcade bar with a group of 4",
+            "Has pool, food, and drinks"
           ].map((suggestion, idx) => (
             <button
               key={idx}
