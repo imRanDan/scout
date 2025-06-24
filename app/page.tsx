@@ -18,8 +18,12 @@ export default function Page() {
   const [loading, setLoading] = useState(false);         // for "Go"
   const [loadingMore, setLoadingMore] = useState(false); // for "Show me more"
 
-const fetchSpots = async (prompt?: string, append = false) => {
+  // Le pagination
+  const [page, setPage] = useState(1);
+
+const fetchSpots = async (prompt?: string, append = false, pageOverride?: number) => {
   const query = prompt || input;
+  const currentPage = pageOverride || 1;
   if (!query) return;
 
   if (append) {
@@ -31,7 +35,7 @@ const fetchSpots = async (prompt?: string, append = false) => {
   const res = await fetch('/api/query', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: query }),
+    body: JSON.stringify({ prompt: query, page: currentPage }),
   });
 
   const data = await res.json();
@@ -71,7 +75,11 @@ const fetchSpots = async (prompt?: string, append = false) => {
             placeholder="Find a cozy café near Queen West..."
           />
         <button
-          onClick={() => fetchSpots()}
+          onClick={() =>  {
+            setPage(1);
+            setResults([]);
+            fetchSpots(undefined, false, 1);
+          }}
           className="px-4 py-2 bg-blue-600 text-white rounded flex items-center justify-center"
         >
           {loading ? <Spinner /> : <span>Go</span>}
@@ -87,13 +95,15 @@ const fetchSpots = async (prompt?: string, append = false) => {
             "Restaurant open late",
             "Host a group of 10 for happy hour",
             "Arcade bar with a group of 4",
-            "Has pool, food, and drinks"
+            "Poolhall with food and drinks",
           ].map((suggestion, idx) => (
             <button
               key={idx}
               onClick={() => {
                 setInput(suggestion);
-                fetchSpots(suggestion);
+                setPage(1);
+                setResults([]);
+                fetchSpots(suggestion, false, 1);
               }}
               className="px-3 py-1 text-sm bg-white hover:bg-gray-100 border border-gray-300 rounded-lg transition-colors"
               >
@@ -134,7 +144,11 @@ const fetchSpots = async (prompt?: string, append = false) => {
         {results.length > 0 && (
           <div className="text-center mt-6">
             <button
-              onClick={() => fetchSpots()}
+              onClick={() => {
+                const nextPage = page + 1;
+                setPage(nextPage);
+                fetchSpots(undefined, true, nextPage);
+              }}
               className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-sm rounded flex items-center justify-center"
               disabled={loadingMore}
             >

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { prompt } = req.body;
+  const { prompt, page = 1 } = req.body;
 
 const systemPrompt = `
 You are Scout, a hyper-local AI assistant that helps users find cafés, bars, restaurants, and venues in **Toronto** based on natural language requests.
@@ -47,7 +47,7 @@ Example response:
       model: "gpt-4-1106-preview",
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: prompt },
+        { role: "user", content: `${prompt} (Page ${page})` },
       ],
       temperature: 0.7,
     }),
