@@ -18,8 +18,9 @@ export default function Page() {
   const [loading, setLoading] = useState(false);         // for "Go"
   const [loadingMore, setLoadingMore] = useState(false); // for "Show me more"
 
-const fetchSpots = async (append = false) => {
-  if (!input) return;
+const fetchSpots = async (prompt?: string, append = false) => {
+  const query = prompt || input;
+  if (!query) return;
 
   if (append) {
     setLoadingMore(true);
@@ -30,7 +31,7 @@ const fetchSpots = async (append = false) => {
   const res = await fetch('/api/query', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: input }),
+    body: JSON.stringify({ prompt: query }),
   });
 
   const data = await res.json();
@@ -77,6 +78,27 @@ const fetchSpots = async (append = false) => {
         </button>
         </div>
 
+        {/* Suggested Prompts */}
+        <div className="mb-6 flex flex-wrap gap-2">
+          {[
+            "Cozy cafe near Queen West",
+            "Gastropub for a group of 6",
+            "Quiet Coffee shop to work at",
+            "Restaurant open late",
+          ].map((suggestion, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                setInput(suggestion);
+                fetchSpots(suggestion);
+              }}
+              className="px-3 py-1 text-sm bg-white hover:bg-gray-100 border border-gray-300 rounded-lg transition-colors"
+              >
+                {suggestion}
+              </button>
+          ))}
+        </div>
+
         <div className="space-y-4">
           {results.map((spot, index) => (
             
@@ -109,7 +131,7 @@ const fetchSpots = async (append = false) => {
         {results.length > 0 && (
           <div className="text-center mt-6">
             <button
-              onClick={() => fetchSpots(true)}
+              onClick={() => fetchSpots()}
               className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-sm rounded flex items-center justify-center"
               disabled={loadingMore}
             >
